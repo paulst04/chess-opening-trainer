@@ -8,7 +8,11 @@ import { FENConverter } from 'src/app/chess-logic/FENConverter';
 export class ChessBoardService {
   public chessBoardState$ = new BehaviorSubject<string>(FENConverter.initalPosition);
 
-  public resetBoard(): void {
-    this.chessBoardState$.next(FENConverter.initalPosition); // Reset board state
-  }
+  constructor() {}
+
+  // /** Resets the board by setting the FEN string to the initial position */
+  // public resetBoard(): void {
+  //   console.log(FENConverter.initalPosition);
+  //   this.chessBoardState$.next(FENConverter.initalPosition); // Notify subscribers
+  // }
 }

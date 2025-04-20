@@ -5,6 +5,7 @@ import { ChessBoardService } from '../chess-board/chess-board.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { Color } from 'src/app/chess-logic/models';
 import { getOpeningColor, getRandomOpeningName } from './openings';
+import { chessOpeningStatus } from './models';
 
 @Component({
   selector: 'app-opening-knowledge-mode',
@@ -13,9 +14,11 @@ import { getOpeningColor, getRandomOpeningName } from './openings';
 })
 export class OpeningKnowledgeModeComponent extends ChessBoardComponent implements OnInit, OnDestroy {
   private computerSubscriptions$ = new Subscription();
-  private currentOpeningIndex = 0;
-  private currentOpening = "";
-  private openingColor = Color.White;
+  private openingStatus: chessOpeningStatus = {
+    name: "",
+    openingIndex: 0,
+    color: Color.White
+  };
 
   constructor(private openingKnowledgeService: OpeningKnowledgeService) {
     super(inject(ChessBoardService));
@@ -23,8 +26,8 @@ export class OpeningKnowledgeModeComponent extends ChessBoardComponent implement
 
   public override ngOnInit(): void {
     super.ngOnInit();
-    this.currentOpening = getRandomOpeningName();
-    this.openingColor = getOpeningColor(this.currentOpening);
+    this.openingStatus.name = getRandomOpeningName();
+    this.openingStatus.color = getOpeningColor(this.openingStatus.name);
 
     // const computerConfiSubscription$: Subscription = this.openingKnowledgeService.computerConfiguration$.subscribe({
     //   next: (computerConfiguration) => {
@@ -39,13 +42,25 @@ export class OpeningKnowledgeModeComponent extends ChessBoardComponent implement
           return;
         }
 
-        const player: Color = FEN.split(" ")[1] === "w" ? Color.White : Color.Black;
-        if (player !== this.openingColor) return;
-        if(this.currentOpeningIndex>5) return;
+        console.log(this.openingStatus.openingIndex);
 
-        const { prevX, prevY, newX, newY, promotedPiece } =await firstValueFrom(this.openingKnowledgeService.getBestMove(this.currentOpening, this.currentOpeningIndex, this.openingColor));
+        // Check if opening is over (after move 2) and reset board
+        if (this.openingStatus.openingIndex > 2) {
+          this.startNewOpening();
+           // Ensure we don’t continue execution
+        }
+
+        // Determine player from FEN
+        const player: Color = FEN.split(" ")[1] === "w" ? Color.White : Color.Black;
+        if (player !== this.openingStatus.color) return;
+
+        // Fetch next move
+        const { prevX, prevY, newX, newY, promotedPiece } = await firstValueFrom(
+          this.openingKnowledgeService.getNextOpeningMove(this.openingStatus)
+        );
+
         this.updateBoard(prevX, prevY, newX, newY, promotedPiece);
-        this.currentOpeningIndex++;
+        this.openingStatus.openingIndex++;
       }
     });
 
@@ -56,5 +71,14 @@ export class OpeningKnowledgeModeComponent extends ChessBoardComponent implement
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
     this.computerSubscriptions$.unsubscribe();
+  }
+
+  public startNewOpening(): void {
+    // Reset opening status
+    this.openingStatus.name = getRandomOpeningName();
+    this.openingStatus.color = getOpeningColor(this.openingStatus.name);
+    this.openingStatus.openingIndex = 0;
+
+    this.resetBoard(); // Reset the board using the service
   }
 }

@@ -5,6 +5,7 @@ import { SelectedSquare } from './models';
 import { ChessBoardService } from './chess-board.service';
 import { Subscription, filter, fromEvent, tap } from 'rxjs';
 import { FENConverter } from 'src/app/chess-logic/FENConverter';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-chess-board',
@@ -42,7 +43,15 @@ export class ChessBoardComponent implements OnInit, OnDestroy {
   public flipMode: boolean = false;
   private subscriptions$ = new Subscription();
 
-  constructor(protected chessBoardService: ChessBoardService) { }
+  constructor(
+    protected chessBoardService: ChessBoardService
+  ) { }
+
+  public resetBoard(): void {
+    this.chessBoard = new ChessBoard(); // Create a new chessboard instance
+    this.chessBoardService.chessBoardState$.next(FENConverter.initalPosition);
+    console.log("Chessboard has been reset.");
+  }
 
   public ngOnInit(): void {
     const keyEventSubscription$: Subscription = fromEvent<KeyboardEvent>(document, "keyup")

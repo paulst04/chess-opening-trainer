@@ -49,6 +49,10 @@ const openings = {
             {
                 w: "d2d4",
                 b: "d7d5"
+            },
+            {
+                w: "e4e5",
+                b: "c6c5"
             }
         ]
     }

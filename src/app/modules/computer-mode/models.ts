@@ -33,3 +33,4 @@ export const stockfishLevels: Readonly<Record<number, number>> = {
     4: 13,
     5: 15
 }
+
