@@ -43,7 +43,6 @@ export function getOpeningColor(opening: string): Color {
 
 export function getRandomOpeningName(): string {
     const openingNamesAsString = localStorage.getItem('openingNames')
-    console.log(openingNamesAsString)
     const openingNames = openingNamesAsString ? JSON.parse(openingNamesAsString) : Object.keys(openings)
     const randomOpeningIndex = Math.floor(Math.random() * openingNames.length);
     const opening = openingNames[randomOpeningIndex];

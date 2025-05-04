@@ -7,6 +7,8 @@ import { Color } from 'src/app/chess-logic/models';
 import { getOpeningColor, getRandomOpeningName } from './openings';
 import { chessOpeningStatus } from './models';
 
+import { getChessMove } from './openings';
+
 @Component({
   selector: 'app-opening-knowledge-mode',
   templateUrl: '../chess-board/chess-board.component.html',
@@ -42,17 +44,20 @@ export class OpeningKnowledgeModeComponent extends ChessBoardComponent implement
           return;
         }
 
-        console.log(this.openingStatus.openingIndex);
-
         // Check if opening is over (after move 2) and reset board
-        if (this.openingStatus.openingIndex > 2) {
-          window.location.reload()
-           // Ensure we don’t continue execution
-        }
+        // if (this.openingStatus.openingIndex > 2) {
+        //   window.location.reload()
+        //    // Ensure we don’t continue execution
+        // }
 
         // Determine player from FEN
         const player: Color = FEN.split(" ")[1] === "w" ? Color.White : Color.Black;
         if (player !== this.openingStatus.color) return;
+
+
+        if (this.openingKnowledgeService.isMoveIncorrect(this.openingStatus, this.lastMove)) {
+          window.location.reload();
+        }
 
         // Fetch next move
         const { prevX, prevY, newX, newY, promotedPiece } = await firstValueFrom(
