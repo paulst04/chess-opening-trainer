@@ -46,7 +46,7 @@ export class OpeningKnowledgeModeComponent extends ChessBoardComponent implement
 
         // Check if opening is over (after move 2) and reset board
         if (this.openingStatus.openingIndex > 2) {
-          this.startNewOpening();
+          window.location.reload()
            // Ensure we don’t continue execution
         }
 
@@ -71,14 +71,5 @@ export class OpeningKnowledgeModeComponent extends ChessBoardComponent implement
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
     this.computerSubscriptions$.unsubscribe();
-  }
-
-  public startNewOpening(): void {
-    // Reset opening status
-    this.openingStatus.name = getRandomOpeningName();
-    this.openingStatus.color = getOpeningColor(this.openingStatus.name);
-    this.openingStatus.openingIndex = 0;
-
-    this.resetBoard(); // Reset the board using the service
   }
 }
